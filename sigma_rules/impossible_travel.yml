@@ -1,0 +1,24 @@
+title: Impossible Travel Between Successful Logins
+id: 8f2b6e2a-1e0b-4e0a-9c1a-000000000002
+status: experimental
+description: >
+  Detects successful authentications for the same account from more than
+  one country within a short window, consistent with a stolen-credential
+  session running concurrently with the legitimate user, or the attacker
+  logging in shortly after.
+references:
+  - https://attack.mitre.org/techniques/T1078/
+mitre_attack:
+  tactic: TA0001
+  tactic_name: Initial Access
+  techniques: [T1078]
+logsource:
+  category: authentication
+  product: endpoint
+detection:
+  selections:
+    logins:
+      event_type: login_success
+  condition: "distinct_count(logins.country) >= 2"
+timeframe: 30m
+level: critical

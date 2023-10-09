@@ -1,0 +1,23 @@
+title: Brute Force Authentication Attempts
+id: 8f2b6e2a-1e0b-4e0a-9c1a-000000000001
+status: experimental
+description: >
+  Detects a burst of failed authentication attempts against a single
+  account from a single source, indicative of password brute forcing or
+  credential stuffing.
+references:
+  - https://attack.mitre.org/techniques/T1110/
+mitre_attack:
+  tactic: TA0006
+  tactic_name: Credential Access
+  techniques: [T1110, T1110.001]
+logsource:
+  category: authentication
+  product: endpoint
+detection:
+  selections:
+    failures:
+      event_type: login_failure
+  condition: "count(failures) >= 5"
+timeframe: 10m
+level: high

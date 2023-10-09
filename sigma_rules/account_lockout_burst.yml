@@ -1,0 +1,25 @@
+title: Account Lockout Following Failed Login Burst
+id: 8f2b6e2a-1e0b-4e0a-9c1a-000000000004
+status: experimental
+description: >
+  Detects an account lockout event immediately preceded by repeated
+  failures, distinguishing an active brute-force attempt that tripped
+  lockout policy from a single forgotten-password lockout.
+references:
+  - https://attack.mitre.org/techniques/T1110/001/
+mitre_attack:
+  tactic: TA0006
+  tactic_name: Credential Access
+  techniques: [T1110.001]
+logsource:
+  category: authentication
+  product: endpoint
+detection:
+  selections:
+    failures:
+      event_type: login_failure
+    lockout:
+      event_type: account_lockout
+  condition: "count(failures) >= 4 and count(lockout) >= 1"
+timeframe: 10m
+level: medium
