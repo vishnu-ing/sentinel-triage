@@ -1,0 +1,26 @@
+title: Privilege Use Following Repeated Authentication Failures
+id: 8f2b6e2a-1e0b-4e0a-9c1a-000000000003
+status: experimental
+description: >
+  Detects a privileged action shortly after several failed login attempts
+  for the same account, suggesting an attacker eventually guessed valid
+  credentials and immediately attempted to escalate or abuse privileges.
+references:
+  - https://attack.mitre.org/techniques/T1078/
+  - https://attack.mitre.org/techniques/T1068/
+mitre_attack:
+  tactic: TA0004
+  tactic_name: Privilege Escalation
+  techniques: [T1078, T1068]
+logsource:
+  category: authentication
+  product: endpoint
+detection:
+  selections:
+    failures:
+      event_type: login_failure
+    priv_use:
+      event_type: privilege_use
+  condition: "count(failures) >= 3 and count(priv_use) >= 1"
+timeframe: 15m
+level: high

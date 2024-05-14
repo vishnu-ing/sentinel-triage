@@ -1,0 +1,55 @@
+# Local dev stack for running sentinel-triage against a REAL OpenSearch
+# cluster + Redis Streams + a Grafana dashboard, instead of the in-memory
+# fakes used by the unit test suite. Not required to build the image or
+# run `pytest` -- this is purely for manual / integration exploration.
+#
+#   docker compose up -d
+#   docker compose exec app python scripts/ingest_and_triage.py
+#
+services:
+  opensearch:
+    image: opensearchproject/opensearch:2.15.0
+    container_name: sentinel-opensearch
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+    ports:
+      - "9200:9200"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: sentinel-redis
+    ports:
+      - "6379:6379"
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    container_name: sentinel-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - opensearch
+
+  app:
+    build: .
+    container_name: sentinel-app
+    entrypoint: ["tail", "-f", "/dev/null"] # keep alive for `docker compose exec`
+    environment:
+      - OPENSEARCH_HOST=opensearch
+      - OPENSEARCH_PORT=9200
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - opensearch
+      - redis
+
+volumes:
+  opensearch-data:
+  grafana-data:
