@@ -1,0 +1,14 @@
+# Core (offline-runnable, required for unit tests)
+PyYAML>=6.0
+
+# Optional: real backends, only imported lazily by the corresponding
+# adapters (OpenSearchIndexer, RedisEventStream, OpenAIFunctionCallingClient).
+# Not required to run the unit test suite.
+opensearch-py>=2.4
+redis>=5.0
+openai>=1.30
+
+# Dev / test
+pytest>=7.4
+pytest-cov>=4.1
+hypothesis>=6.100
